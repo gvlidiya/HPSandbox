@@ -3,22 +3,21 @@
 from setuptools import setup, find_packages
 from os import path
 from io import open
-import sys
-from pip._internal.req import parse_requirements
-
-# parse_requirements() returns generator of pip.req.InstallRequirement objects
-# We need two seperate requirement files due to the failure to install all at once.
-requirements = parse_requirements('requirements.txt', session=False)
-requirements = list(requirements)
-try:
-    requirements = [str(ir.req) for ir in requirements]
-except:
-    requirements = [str(ir.requirement) for ir in requirements]
 
 here = path.abspath(path.dirname(__file__))
+requirements_path = path.join(here, "requirements.txt")
+
+# Read requirements.txt without relying on pip internals (works in build isolation)
+requirements_path = path.join(here, "requirements.txt")
+with open(requirements_path, "r", encoding="utf-8") as f:
+    requirements = [
+        line.strip()
+        for line in f
+        if line.strip() and not line.strip().startswith("#")
+    ]
 
 # Get the long description from the README file
-with open(path.join(here, 'README.md'), "r", encoding='utf-8') as f:
+with open(path.join(here, "README.md"), "r", encoding="utf-8") as f:
     long_description = f.read()
 
 
